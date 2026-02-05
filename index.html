@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WITCHES & VIKINGS | Arcane Eclipse</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <div id="parallax-bg"></div>
+    <div id="particles"></div>
+    <div class="vignette"></div>
+
+    <div id="loader">
+        <div class="loader-content">
+            <div class="pentagram-loader">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <p>Otwieranie Wrót...</p>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <nav class="navbar glass">
+        <div class="logo" onclick="app.router.go('home')">
+            <i class="fa-solid fa-dragon"></i> W&V <span>Arcane</span>
+        </div>
+        
+        <div class="nav-links">
+            <a onclick="app.router.go('home')">Start</a>
+            <a onclick="app.router.go('shop')">Skarbiec</a>
+            <a onclick="app.router.go('history')">Grimuar</a>
+        </div>
+
+        <div class="nav-actions">
+            <button class="icon-btn tooltip" onclick="app.modals.open('adminLogin')" data-tooltip="Mistrz Gry">
+                <i class="fa-solid fa-user-secret"></i>
+            </button>
+            
+            <button class="icon-btn tooltip" onclick="app.auth.handleProfileClick()" data-tooltip="Profil">
+                <i class="fa-solid fa-user-astronaut" id="userIcon"></i>
+            </button>
+            
+            <button class="icon-btn tooltip cart-trigger" onclick="app.cart.toggle()" data-tooltip="Sakwa">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="badge" id="cartBadge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main id="app-container">
+        
+        <section id="view-home" class="view active">
+            <div class="hero-content">
+                <h1 class="glitch-title" data-text="CIEŃ I STAL">CIEŃ I STAL</h1>
+                <p>Ekskluzywne artefakty tworzone na styku magii i rzemiosła.</p>
+                <div class="hero-btns">
+                    <button class="btn-primary big" onclick="app.router.go('shop')">Odkryj Kolekcję</button>
+                    <button class="btn-secondary big" onclick="app.router.go('history')">Poznaj Legendę</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-history" class="view hidden">
+            <div class="history-card glass-panel tilt-card">
+                <div class="card-content">
+                    <h2><i class="fa-solid fa-book-journal-whills"></i> Kroniki Gaju</h2>
+                    <p>W sercu starego lasu, gdzie mgła nigdy nie opada, spotkały się dwa światy. Wikingowie przynieśli ogień i stal, Wiedźmy zaś zioła i zaklęcia. Tak powstało Witches & Vikings.</p>
+                    <p>Dziś tworzymy przedmioty nasycone intencją. Każda świeca jest zalewana podczas pełni, każdy amulet kuty o świcie. Nie sprzedajemy przedmiotów – sprzedajemy magię.</p>
+                    <div class="signature">Arcydruid & Jarl</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-shop" class="view hidden">
+            <div class="shop-controls glass-panel">
+                <div class="filters">
+                    <button class="filter-btn active" onclick="app.shop.filter('all', this)">Wszystko</button>
+                    <button class="filter-btn" onclick="app.shop.filter('witch', this)">Magia</button>
+                    <button class="filter-btn" onclick="app.shop.filter('viking', this)">Stal</button>
+                </div>
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Szukaj zaklęcia..." onkeyup="app.shop.search(this.value)">
+                </div>
+            </div>
+            <div class="products-grid" id="shopGrid">
+                </div>
+        </section>
+
+        <section id="view-admin" class="view hidden">
+            <div class="admin-layout">
+                <aside class="admin-sidebar glass-panel">
+                    <div class="admin-profile">
+                        <i class="fa-solid fa-crown gold-text"></i>
+                        <span id="adminNameDisplay">Mistrz</span>
+                    </div>
+                    <nav class="admin-nav">
+                        <li onclick="app.admin.switchView('dash')" class="active"><i class="fa-solid fa-chart-pie"></i> Kokpit</li>
+                        <li onclick="app.admin.switchView('products')"><i class="fa-solid fa-flask"></i> Magazyn</li>
+                        <li onclick="app.admin.switchView('orders')"><i class="fa-solid fa-scroll"></i> Zamówienia</li>
+                        <li onclick="location.reload()" class="danger"><i class="fa-solid fa-power-off"></i> Wyjdź</li>
+                    </nav>
+                </aside>
+                
+                <div class="admin-content">
+                    <div id="adm-dash" class="adm-subview">
+                        <h2>Stan Magii</h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>Produkty</h3>
+                                <span id="statProd">0</span>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Klienci</h3>
+                                <span id="statUsers">0</span>
+                            </div>
+                            <div class="stat-card gold-border">
+                                <h3>Skarbiec</h3>
+                                <span id="statValue">0 PLN</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="adm-products" class="adm-subview hidden">
+                        <div class="flex-header">
+                            <h2>Artefakty</h2>
+                            <button class="btn-primary small" onclick="app.modals.open('addProd')">+ Stwórz</button>
+                        </div>
+                        <div class="table-container glass-panel">
+                            <table class="magic-table">
+                                <thead><tr><th>Obraz</th><th>Nazwa</th><th>Cena</th><th>Akcja</th></tr></thead>
+                                <tbody id="admProdTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="adm-orders" class="adm-subview hidden">
+                        <h2>Księga Zamówień</h2>
+                        <div class="table-container glass-panel">
+                            <table class="magic-table">
+                                <thead><tr><th>Klient</th><th>Kwota</th><th>Status</th><th>Zaklęcie</th></tr></thead>
+                                <tbody id="admOrderTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="modal-overlay hidden" id="modal-clientAuth">
+        <div class="modal-box glass-panel pop-in">
+            <span class="close-modal" onclick="app.modals.close()">&times;</span>
+            <div class="tabs-auth">
+                <button class="tab-btn active" onclick="app.auth.switchTab('login')">Wejście</button>
+                <button class="tab-btn" onclick="app.auth.switchTab('register')">Inicjacja</button>
+            </div>
+            
+            <form id="formClientLogin">
+                <div class="input-wrap">
+                    <input type="text" id="clLogin" required placeholder=" ">
+                    <label>Twój Login</label>
+                </div>
+                <div class="input-wrap">
+                    <input type="password" id="clPass" required placeholder=" ">
+                    <label>Hasło</label>
+                </div>
+                <button type="submit" class="btn-primary full">Otwórz Wrota</button>
+            </form>
+
+            <form id="formClientReg" class="hidden">
+                <div class="input-wrap"><input type="text" id="crLogin" required placeholder=" "><label>Nowe Imię</label></div>
+                <div class="input-wrap"><input type="email" id="crEmail" required placeholder=" "><label>E-mail</label></div>
+                <div class="input-wrap"><input type="password" id="crPass" required placeholder=" "><label>Hasło</label></div>
+                <button type="submit" class="btn-primary full">Złóż Przysięgę</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="modal-adminLogin">
+        <div class="modal-box glass-panel admin-style pop-in">
+            <span class="close-modal" onclick="app.modals.close()">&times;</span>
+            <div class="modal-header">
+                <i class="fa-solid fa-dragon"></i>
+                <h3>Rada Starszych</h3>
+            </div>
+            
+            <form id="formAdminLogin">
+                <div class="input-wrap admin-inp">
+                    <input type="text" id="admUser" required placeholder=" ">
+                    <label>Strażnik</label>
+                </div>
+                <div class="input-wrap admin-inp">
+                    <input type="password" id="admPass" required placeholder=" ">
+                    <label>Runy</label>
+                </div>
+                <button type="submit" class="btn-gold full">Weryfikacja</button>
+                <p class="link-text" onclick="app.auth.toggleAdminForgot(true)">Zapomniałeś run?</p>
+            </form>
+
+            <form id="formAdminForgot" class="hidden">
+                <p class="info-text">Wyślij kruka z prośbą o reset.</p>
+                <div class="input-wrap admin-inp">
+                    <input type="email" id="admForgotEmail" required placeholder=" ">
+                    <label>E-mail Strażnika</label>
+                </div>
+                <button type="submit" class="btn-gold full">Wyślij Kruka</button>
+                <p class="link-text" onclick="app.auth.toggleAdminForgot(false)">Wróć</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="modal-addProd">
+        <div class="modal-box glass-panel pop-in">
+            <h3>Stwórz Artefakt</h3>
+            <form id="formAddProd">
+                <div class="input-wrap"><input type="text" id="npName" required placeholder=" "><label>Nazwa</label></div>
+                <div class="input-wrap"><input type="number" id="npPrice" required placeholder=" "><label>Cena</label></div>
+                <select id="npCat" class="magic-select"><option value="witch">Wiedźma</option><option value="viking">Wiking</option></select>
+                <div class="input-wrap"><input type="url" id="npImg" required placeholder=" "><label>URL Obrazka</label></div>
+                <button type="submit" class="btn-primary full">Zapisz w Księdze</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cart-panel" class="glass-panel">
+        <div class="cart-head">
+            <h3>Sakwa <span id="cartHeaderCount">(0)</span></h3>
+            <i class="fa-solid fa-xmark close-cart" onclick="app.cart.toggle()"></i>
+        </div>
+        <div id="cart-body">
+            </div>
+        <div class="cart-foot">
+            <div class="total-row"><span>Razem:</span> <b id="cartTotal" class="gold-text">0 PLN</b></div>
+            <button class="btn-primary full shine" onclick="app.cart.checkout()">Złóż Ofiarę</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
